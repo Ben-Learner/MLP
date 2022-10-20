@@ -25,15 +25,15 @@ def check_grad(calc_loss_and_grad):
 
     # generate random test data
     x = np.random.rand(5, 15)
-    y = np.random.rand(5, 3)
+    y = np.random.rand(5, 3) #3->4 方便测试
     # construct one hot labels
     y = y * (y >= np.max(y, axis=1, keepdims=True)) / np.max(y, axis=1, keepdims=True)
 
     # generate random parameters
     w1 = np.random.rand(15, 3)
     b1 = np.random.rand(3)
-    w2 = np.random.rand(3, 3)
-    b2 = np.random.rand(3)
+    w2 = np.random.rand(3, 3) #3->4 方便测试
+    b2 = np.random.rand(3) #3->4 方便测试
 
     # calculate grad by backward propagation
     loss, db2, dw2, db1, dw1 = calc_loss_and_grad(x, y, w1, b1, w2, b2)
@@ -77,3 +77,31 @@ def check_grad(calc_loss_and_grad):
     print('Relative error of db1', relative_error(numeric_db1, db1))
     print('If you implement back propagation correctly, all these relative errors should be less than 1e-5.')
 
+class Relu:
+    """
+    Define RELU function and its derivative
+    """
+    def __call__(self, x):
+        return np.where(x >= 0, x, 0)
+    def gradient(self, x):
+        return np.where(x >= 0, 1, 0)
+
+class Softmax:
+    """
+     Define Softmax function and its derivative
+    """
+    def __call__(self, x):
+        e_x = np.exp(x - np.max(x, axis=1, keepdims = True))
+        return e_x / np.sum(e_x, axis=1, keepdims = True)
+    def gradient(self, y, y_hat):  #为了方便，实际上表示的 Cross_entropy_loss梯度和softmax梯度的乘积（引入雅各比矩阵似乎可以表示softmax的导数）
+        return y_hat - y
+
+class Cross_entropy_loss:
+    """
+    Define cross-entropy loss function and its derivative
+    """
+    def __call__(self, y, y_hat):
+        return -np.sum(y * np.log(y_hat))
+
+    def gradient(self, y, y_hat):
+        return -y / y_hat

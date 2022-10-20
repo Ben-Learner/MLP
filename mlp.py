@@ -26,14 +26,28 @@ def calc_loss_and_grad(x, y, w1, b1, w2, b2, eval_only=False):
 
     # TODO
     # forward pass
-    loss, y_hat = None, None
+    batch_size = x.shape[0]
+    z1 = ((np.dot(w1.T, x.T)).T + b1).T #3*5
+    relu = utils.Relu()
+    a1 = relu(z1) #3*5
+    z2 = ((np.dot(w2.T, a1)).T + b2).T #4*5
+    softmax = utils.Softmax()
+    a2 = softmax(z2) #4*5
+    y_hat = a2 #4*5
+    cross_entropy_loss = utils.Cross_entropy_loss()
+    loss = cross_entropy_loss(y.T, y_hat) / batch_size
+    # loss, y_hat = None, None
 
     if eval_only:
         return loss, y_hat
 
     # TODO
     # backward pass
-    db2, dw2, db1, dw1 = None, None, None, None
+    dz2 = softmax.gradient(y.T, y_hat) #4*5
+    dw2 = np.dot(dz2, a1.T) / batch_size
+    db2 = np.dot((y_hat - y.T), np.ones((batch_size, 1))) / batch_size
+    dw1 = np.dot(np.dot(w2, y_hat - y.T) * relu.gradient(z1), x) / batch_size
+    db1 = np.dot(np.dot(w2, y_hat - y.T) * relu.gradient(z1), np.ones((batch_size,1))) / batch_size
 
     return loss, db2, dw2, db1, dw1
 
