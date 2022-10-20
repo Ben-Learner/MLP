@@ -25,15 +25,15 @@ def check_grad(calc_loss_and_grad):
 
     # generate random test data
     x = np.random.rand(5, 15)
-    y = np.random.rand(5, 3) #3->4 方便测试
+    y = np.random.rand(5, 3)
     # construct one hot labels
     y = y * (y >= np.max(y, axis=1, keepdims=True)) / np.max(y, axis=1, keepdims=True)
 
     # generate random parameters
     w1 = np.random.rand(15, 3)
     b1 = np.random.rand(3)
-    w2 = np.random.rand(3, 3) #3->4 方便测试
-    b2 = np.random.rand(3) #3->4 方便测试
+    w2 = np.random.rand(3, 3)
+    b2 = np.random.rand(3)
 
     # calculate grad by backward propagation
     loss, db2, dw2, db1, dw1 = calc_loss_and_grad(x, y, w1, b1, w2, b2)

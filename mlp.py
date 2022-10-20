@@ -64,7 +64,11 @@ def train(train_x, train_y, test_x, text_y, args: argparse.Namespace):
 
     # TODO
     #  randomly initialize the parameters (weights and biases)
-    w1, b1, w2, b2 = None, None, None, None
+    w1 = np.random.rand(input_dim, args.hidden_dim)
+    b1 = np.random.rand(args.hidden_dim)
+    w2 = np.random.rand(args.hidden_dim, output_dim)
+    b2 = np.random.rand(output_dim)
+    # w1, b1, w2, b2 = None, None, None, None
 
     print('Start training:')
     print_freq = 100
@@ -73,7 +77,9 @@ def train(train_x, train_y, test_x, text_y, args: argparse.Namespace):
     for epoch in range(args.epochs):
         # train for one epoch
         print("[Epoch #{}]".format(epoch))
-
+        # adjust lr
+        if (epoch % 5 ==0) and (epoch !=0):
+            args.lr =  args.lr * 0.35
         # random shuffle dataset
         dataset = np.hstack((train_x, train_y))
         np.random.shuffle(dataset)
@@ -87,13 +93,18 @@ def train(train_x, train_y, test_x, text_y, args: argparse.Namespace):
             x_batch = train_x[i * args.batch_size: (i + 1) * args.batch_size, :]
             y_batch = train_y[i * args.batch_size: (i + 1) * args.batch_size, :]
 
+
             # TODO
             # compute loss and gradients
-            loss = None
+            loss, db2, dw2, db1, dw1 = calc_loss_and_grad(x_batch, y_batch, w1, b1, w2, b2)
+            # loss = None
 
             # TODO
             # update parameters
-
+            w2 -= args.lr * dw2
+            b2 -= args.lr * db2
+            w1 -= args.lr * dw1
+            b1 -= args.lr * db1
             loss_curve.append(loss)
             if i % print_freq == 0:
                 print('[Iteration #{}/{}] [Loss #{:4f}]'.format(i, n_iterations, loss))
@@ -141,13 +152,13 @@ def main(args: argparse.Namespace):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Multilayer Perceptron')
-    parser.add_argument('--hidden-dim', default=50, type=int,
+    parser.add_argument('--hidden-dim', default=35, type=int,
                         help='hidden dimension of the Multilayer Perceptron')
-    parser.add_argument('--lr', default=0.001, type=float,
+    parser.add_argument('--lr', default=0.0035, type=float,
                         help='learning rate')
-    parser.add_argument('--batch-size', default=16, type=int,
+    parser.add_argument('--batch-size', default=5, type=int,
                         help='mini-batch size')
-    parser.add_argument('--epochs', default=10, type=int,
+    parser.add_argument('--epochs', default=25, type=int,
                         help='number of total epochs to run')
     args = parser.parse_args()
     main(args)
