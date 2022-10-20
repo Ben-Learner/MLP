@@ -45,9 +45,9 @@ def calc_loss_and_grad(x, y, w1, b1, w2, b2, eval_only=False):
     # backward pass
     dz2 = softmax.gradient(y, y_hat) #4*5
     dw2 = np.dot(dz2.T, a1) / batch_size
-    db2 = np.sum(dz2.T, axis=1) / batch_size
+    db2 = np.mean(dz2.T, axis=1)
     dw1 = np.dot(np.dot(w2, dz2.T) * (relu.gradient(z1).T), x) / batch_size
-    db1 = np.sum((np.dot(w2, dz2.T) * (relu.gradient(z1)).T), axis=1) / batch_size
+    db1 = np.mean((np.dot(w2, dz2.T) * (relu.gradient(z1)).T), axis=1)
 
     return loss, db2.T, dw2.T, db1.T, dw1.T
 
